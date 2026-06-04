@@ -1,0 +1,17 @@
+{
+  "short_name": "Saku Medika",
+  "name": "Saku Medika - Catatan Praktek Perawat",
+  "icons": [
+    {
+      "src": "./logo.svg",
+      "sizes": "72x72 96x96 128x128 144x144 192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#FFFDE7",
+  "theme-color": "#f9a825",
+  "display": "standalone",
+  "orientation": "portrait"
+}

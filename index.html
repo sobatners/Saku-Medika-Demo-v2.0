@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catatan Praktek Perawat</title>
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#f9a825">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Saku Medika">
+<link rel="apple-touch-icon" href="./logo.svg">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Caveat',cursive;background:#F4F3EF}
+
+/* Login Page Styles */
+.login-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #F4F3EF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.login-box {
+    background: #FFFDE7;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    border: 2px solid #f9a825;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+}
+.login-box h2 {
+    font-size: 28px;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+}
+.login-box p {
+    font-size: 15px;
+    color: #5d4037;
+    margin-bottom: 20px;
+}
+.login-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+.login-group label {
+    font-size: 16px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    color: #444;
+}
+.login-group input {
+    width: 100%;
+    padding: 8px 40px 8px 12px;
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    color: #1a1a1a;
+}
+.pass-wrap {
+    position: relative;
+}
+.eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 2px;
+    color: #aaa;
+    transition: color 0.2s;
+    user-select: none;
+}
+.eye-btn:hover { color: #f9a825; }
+.login-btn {
+    width: 100%;
+    padding: 8px;
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    font-weight: 700;
+    background: #f9a825;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.login-error {
+    color: #c62828;
+    font-size: 14px;
+    margin-top: 10px;
+    display: none;
+    font-weight: 700;
+}
+
+/* Main Content Note Styles */
+.note-container-wrapper {
+    display: none; /* Tersembunyi sebelum sukses login */
+}
+.note{background:#FFFDE7;min-height:100vh;padding:0;font-family:'Caveat',cursive;color:#1a1a1a;position:relative}
+.note::before{content:'';position:absolute;top:0;left:60px;width:2px;height:100%;background:#ffcdd2;z-index:0}
+.note-header{background:#FFFDE7;border-bottom:3px solid #f9a825;padding:16px 20px 12px 70px;position:relative;z-index:1}
+.note-header h1{font-size:26px;font-weight:700;color:#1a1a1a;letter-spacing:1px;text-align:center}
+.note-header .subtitle{font-size:14px;color:#5d4037;text-align:center;margin-top:2px}
+.lines-wrap{padding:8px 16px 20px 70px;position:relative;z-index:1}
+.section{margin-bottom:18px;padding:12px 14px;background:#FFFDE7;border-radius:6px;border-left:4px solid #f9a825;position:relative}
+.section::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:#e0e0e0;opacity:0.4}
+.sec-title{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sec-title .num{background:#f9a825;color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.hl-yellow{background:#FFF176;padding:1px 5px;border-radius:3px;font-weight:700}
+.hl-green{background:#CCFF90;padding:1px 5px;border-radius:3px;font-weight:700}
+.hl-pink{background:#F48FB1;padding:1px 5px;border-radius:3px;font-weight:700;color:#fff}
+.hl-blue{background:#80D8FF;padding:1px 5px;border-radius:3px;font-weight:700}
+.hl-orange{background:#FFCC80;padding:1px 5px;border-radius:3px;font-weight:700}
+.hl-purple{background:#CE93D8;padding:1px 5px;border-radius:3px;font-weight:700}
+.ttv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:8px 0}
+.ttv-card{background:#fff;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #e0e0e0;cursor:pointer;transition:all 0.2s}
+.ttv-card.normal{border-color:#66BB6A}
+.ttv-card.low{border-color:#42A5F5;background:#E3F2FD}
+.ttv-card.high{border-color:#EF5350;background:#FFEBEE}
+.ttv-card .icon{font-size:24px;display:block;margin-bottom:2px}
+.ttv-card .name{font-size:12px;font-weight:700;color:#444}
+.ttv-card .med-name{font-size:10px;color:#888;font-style:italic}
+.ttv-card .val{font-size:14px;font-weight:700;margin:2px 0}
+.ttv-card .range{font-size:10px;color:#666}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-top:3px}
+.badge-normal{background:#E8F5E9;color:#2E7D32}
+.badge-low{background:#E3F2FD;color:#1565C0}
+.badge-high{background:#FFEBEE;color:#C62828}
+.calc-box{background:#fff;border-radius:8px;padding:10px 12px;border:1.5px dashed #f9a825;margin-top:8px}
+.calc-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.calc-row label{font-size:13px;color:#555;min-width:140px}
+.calc-row input,select{font-family:'Caveat',cursive;font-size:14px;padding:4px 8px;border:1.5px solid #ccc;border-radius:5px;width:80px;background:#FFFDE7;color:#1a1a1a}
+.calc-row select{width:120px}
+.calc-btn{font-family:'Caveat',cursive;font-size:14px;padding:5px 14px;background:#f9a825;border:none;border-radius:6px;cursor:pointer;color:#fff;font-weight:700}
+.calc-result{background:#FFF9C4;border-radius:6px;padding:6px 10px;margin-top:6px;font-size:15px;font-weight:700;color:#1a1a1a;border-left:3px solid #f9a825}
+.formula-box{background:#E8F5E9;border-radius:6px;padding:8px 12px;margin:6px 0;font-size:14px;border-left:3px solid #66BB6A}
+.o2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;margin:8px 0}
+.o2-card{background:#fff;border-radius:8px;padding:8px;text-align:center;border:1.5px solid #90CAF9;font-size:12px}
+.o2-card .o2-icon{font-size:20px}
+.o2-card .o2-name{font-weight:700;font-size:11px;color:#1565C0;margin:2px 0}
+.o2-card .o2-range{font-size:10px;color:#555}
+.o2-card .o2-flow{font-size:10px;color:#888;font-style:italic}
+.gcs-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.gcs-table th{background:#FFF176;color:#333;padding:5px 8px;border:1px solid #ddd;text-align:left}
+.gcs-table td{padding:4px 8px;border:1px solid #eee}
+.gcs-table tr:nth-child(even) td{background:#FFFDE7}
+.gcs-interp{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-top:8px}
+.gcs-badge{border-radius:8px;padding:6px 10px;text-align:center;font-size:12px;font-weight:700}
+.divider{border:none;border-top:1.5px dashed #f9a825;margin:10px 0;opacity:0.5}
+.note-line{border:none;border-top:1px solid #e0e0e0;margin:4px 0;opacity:0.4}
+.ttv-input-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.ttv-input-row input{font-family:'Caveat',cursive;font-size:16px;padding:4px 8px;border:1.5px solid #ccc;border-radius:5px;width:90px;background:#FFFDE7;color:#1a1a1a}
+.ttv-check-result{font-size:13px;padding:4px 8px;border-radius:5px;font-weight:700;margin-top:4px;display:inline-block}
+.tag{display:inline-block;background:#E3F2FD;color:#0D47A1;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px}
+.small-note{font-size:12px;color:#777;font-style:italic;margin-top:3px}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+
+  <!-- ══ PANEL LOGIN ══ -->
+  <div class="login-box" id="panelLogin">
+      <h2>🔑 Login Saku Medika</h2>
+      <p>Silakan masuk untuk mengakses Catatan Praktek Perawat</p>
+      <div class="login-group">
+          <label>Username:</label>
+          <input type="text" id="usernameInput" placeholder="Masukkan username">
+      </div>
+      <div class="login-group">
+          <label>Password:</label>
+          <div class="pass-wrap">
+              <input type="password" id="passwordInput" placeholder="Masukkan password">
+              <button type="button" class="eye-btn" onclick="togglePass('passwordInput',this)" title="Tampilkan/Sembunyikan password">👁️</button>
+          </div>
+      </div>
+      <button class="login-btn" onclick="handleLogin()">Masuk Catatan</button>
+      <div class="login-error" id="loginError"></div>
+      <div style="margin-top:14px;font-size:14px;color:#666">
+        Belum punya akun? <a href="auth.html" style="color:#f9a825;font-weight:700;text-decoration:none">Daftar di sini →</a>
+      </div>
+  </div>
+
+  <!-- ══ PANEL SETUP AKUN PERTAMA ══ -->
+  <div class="login-box" id="panelFirstRun" style="display:none">
+      <h2>🌟 Selamat Datang!</h2>
+      <p>Buat akun pertama kamu untuk mulai menggunakan <strong>Saku Medika</strong></p>
+      <div style="background:#FFF9C4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 12px;font-size:13px;color:#7a6000;margin-bottom:14px;text-align:left">
+        ℹ️ Akun ini akan tersimpan di perangkat kamu dan digunakan untuk login ke aplikasi.
+      </div>
+      <div class="login-group">
+          <label>Username:</label>
+          <input type="text" id="setupUser" placeholder="Min. 3 karakter (huruf, angka, _)" autocomplete="off">
+      </div>
+      <div class="login-group">
+          <label>Password:</label>
+          <div class="pass-wrap">
+              <input type="password" id="setupPass" placeholder="Min. 6 karakter">
+              <button type="button" class="eye-btn" onclick="togglePass('setupPass',this)">👁️</button>
+          </div>
+      </div>
+      <div class="login-group">
+          <label>Konfirmasi Password:</label>
+          <div class="pass-wrap">
+              <input type="password" id="setupConfirm" placeholder="Ketik ulang password">
+              <button type="button" class="eye-btn" onclick="togglePass('setupConfirm',this)">👁️</button>
+          </div>
+      </div>
+      <button class="login-btn" onclick="handleFirstSetup()">Buat Akun & Masuk</button>
+      <div class="login-error" id="setupError"></div>
+  </div>
+
+</div>
+
+<div class="note-container-wrapper" id="noteWrapper">
+<div class="note">
+<div class="note-header">
+  <h1>📓 Catatan Praktek Perawat</h1>
+  <div class="subtitle">Mahasiswa Keperawatan — Rumus & Referensi Klinik</div>
+  <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">
+    <span style="font-size:13px;color:#5d4037">👤 <span id="loggedUserName" style="font-weight:700"></span></span>
+    <a href="auth.html" style="font-size:13px;font-weight:700;color:#f9a825;text-decoration:none;border:1.5px solid #f9a825;border-radius:6px;padding:2px 10px">⚙️ Akun</a>
+    <button onclick="handleLogout()" style="font-family:'Caveat',cursive;font-size:13px;font-weight:700;background:#ef5350;color:#fff;border:none;border-radius:6px;padding:2px 10px;cursor:pointer">🚪 Logout</button>
+  </div>
+</div>
+
+<div class="lines-wrap">
+
+<div class="section">
+  <div class="sec-title"><span class="num">1</span> <span class="hl-yellow">Nilai Normal Tanda-Tanda Vital (TTV)</span></div>
+  <div class="ttv-grid" id="ttvGrid">
+    <div class="ttv-card normal" id="card-td">
+      <span class="icon">🫀</span>
+      <div class="name">Tekanan Darah</div>
+      <div class="med-name">Blood Pressure (BP)</div>
+      <div class="val">120/80 mmHg</div>
+      <div class="range">Normal: 90/60 – 120/80</div>
+      <span class="status-badge badge-normal">NORMAL</span>
+    </div>
+    <div class="ttv-card normal" id="card-nd">
+      <span class="icon">💓</span>
+      <div class="name">Nadi</div>
+      <div class="med-name">Heart Rate (HR)</div>
+      <div class="val">60–100 x/menit</div>
+      <div class="range">Normal: 60–100 bpm</div>
+      <span class="status-badge badge-normal">NORMAL</span>
+    </div>
+    <div class="ttv-card normal" id="card-rr">
+      <span class="icon">🫁</span>
+      <div class="name">Pernapasan</div>
+      <div class="med-name">Respiratory Rate (RR)</div>
+      <div class="val">16–24 x/menit</div>
+      <div class="range">Normal: 16–24 napas/mnt</div>
+      <span class="status-badge badge-normal">NORMAL</span>
+    </div>
+    <div class="ttv-card normal" id="card-su">
+      <span class="icon">🌡️</span>
+      <div class="name">Suhu</div>
+      <div class="med-name">Temperature (Temp)</div>
+      <div class="val">36.5–37.5 °C</div>
+      <div class="range">Normal: 36.5–37.5°C</div>
+      <span class="status-badge badge-normal">NORMAL</span>
+    </div>
+    <div class="ttv-card normal" id="card-spo2">
+      <span class="icon">🩸</span>
+      <div class="name">Saturasi O₂</div>
+      <div class="med-name">SpO₂ / SaO₂</div>
+      <div class="val">95–100 %</div>
+      <div class="range">Normal: ≥95%</div>
+      <span class="status-badge badge-normal">NORMAL</span>
+    </div>
+  </div>
+
+  <div class="calc-box" style="margin-top:10px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">🔍 Cek Status TTV Pasien (Interaktif)</div>
+    <div class="ttv-input-row">
+      <label style="font-size:13px;min-width:130px">TD Sistolik (mmHg):</label>
+      <input type="number" id="ttvTDs" value="120" min="0" max="300">
+      <label style="font-size:13px">/</label>
+      <input type="number" id="ttvTDd" value="80" min="0" max="200">
+    </div>
+    <div class="ttv-input-row">
+      <label style="font-size:13px;min-width:130px">Nadi (bpm):</label>
+      <input type="number" id="ttvNd" value="80" min="0" max="300">
+    </div>
+    <div class="ttv-input-row">
+      <label style="font-size:13px;min-width:130px">RR (x/mnt):</label>
+      <input type="number" id="ttvRR" value="20" min="0" max="60">
+    </div>
+    <div class="ttv-input-row">
+      <label style="font-size:13px;min-width:130px">Suhu (°C):</label>
+      <input type="number" id="ttvSu" value="37" step="0.1" min="30" max="45">
+    </div>
+    <div class="ttv-input-row">
+      <label style="font-size:13px;min-width:130px">SpO₂ (%):</label>
+      <input type="number" id="ttvSpo2" value="98" min="0" max="100">
+    </div>
+    <button class="calc-btn" onclick="cekTTV()">Cek Status TTV</button>
+    <div id="ttvResult" class="calc-result" style="display:none"></div>
+  </div>
+
+  <hr class="divider">
+  <div style="font-size:14px;font-weight:700;margin-bottom:6px">🩺 <span class="hl-blue">Alat Bantu O₂ sesuai SpO₂</span></div>
+  <div class="o2-grid">
+    <div class="o2-card">
+      <div class="o2-icon">👃</div>
+      <div class="o2-name">Nasal Kanul</div>
+      <div class="o2-range">SpO₂ 90–94%</div>
+      <div class="o2-flow">Flow: 1–6 L/mnt</div>
+      <div class="o2-flow">FiO₂: 24–44%</div>
+    </div>
+    <div class="o2-card">
+      <div class="o2-icon">😷</div>
+      <div class="o2-name">Simple Mask</div>
+      <div class="o2-range">SpO₂ 85–90%</div>
+      <div class="o2-flow">Flow: 6–10 L/mnt</div>
+      <div class="o2-flow">FiO₂: 40–60%</div>
+    </div>
+    <div class="o2-card">
+      <div class="o2-icon">🫧</div>
+      <div class="o2-name">Rebreather Mask</div>
+      <div class="o2-range">SpO₂ 80–85%</div>
+      <div class="o2-flow">Flow: 6–10 L/mnt</div>
+      <div class="o2-flow">FiO₂: 60–80%</div>
+    </div>
+    <div class="o2-card">
+      <div class="o2-icon">🫀</div>
+      <div class="o2-name">Non-Rebreather</div>
+      <div class="o2-range">SpO₂ &lt;80%</div>
+      <div class="o2-flow">Flow: 10–15 L/mnt</div>
+      <div class="o2-flow">FiO₂: 80–100%</div>
+    </div>
+    <div class="o2-card" style="border-color:#ef9a9a">
+      <div class="o2-icon">🔬</div>
+      <div class="o2-name">Ventilator</div>
+      <div class="o2-range">SpO₂ kritis / gagal napas</div>
+      <div class="o2-flow">FiO₂: 21–100%</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">2</span> <span class="hl-green">Rumus Tetesan Infus</span></div>
+  <div class="formula-box">
+    <div><span class="hl-yellow">Makro (faktor 20 tts/mL):</span></div>
+    <div style="margin:4px 0;font-size:15px">Tetesan (tts/mnt) = <strong>Volume (mL) × 20</strong> ÷ <strong>Waktu (mnt)</strong></div>
+    <hr class="note-line">
+    <div><span class="hl-pink">Mikro (faktor 60 tts/mL):</span></div>
+    <div style="margin:4px 0;font-size:15px">Tetesan (tts/mnt) = <strong>Volume (mL) × 60</strong> ÷ <strong>Waktu (mnt)</strong></div>
+    <div class="small-note">* Mikro: 1 tetes mikro = 1 mL/jam (jika 60 tts = 60 mnt)</div>
+  </div>
+  <div class="calc-box">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">🧮 Kalkulator Tetesan Infus</div>
+    <div class="calc-row">
+      <label>Volume cairan (mL):</label>
+      <input type="number" id="infVol" value="500" min="1">
+    </div>
+    <div class="calc-row">
+      <label>Durasi pemberian:</label>
+      <input type="number" id="infJam" value="8" min="1" style="width:60px">
+      <span style="font-size:13px">jam</span>
+    </div>
+    <div class="calc-row">
+      <label>Jenis infus set:</label>
+      <select id="infType">
+        <option value="20">Makro (20 tts/mL)</option>
+        <option value="60">Micro (60 tts/mL)</option>
+      </select>
+    </div>
+    <button class="calc-btn" onclick="hitungInfus()">Hitung Tetesan</button>
+    <div id="infResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">3</span> <span class="hl-orange">Rumus Titrasi Obat Injeksi</span></div>
+  <div class="formula-box">
+    <div style="font-size:15px">Dosis yg diberikan (mL) = <span class="hl-yellow">Dosis order (mg/mcg)</span> ÷ <span class="hl-green">Konsentrasi obat (mg/mL)</span></div>
+    <hr class="note-line">
+    <div style="font-size:13px;margin-top:4px"><span class="hl-blue">Konsentrasi obat</span> = Total obat (mg) ÷ Total volume pengencer (mL)</div>
+    <hr class="note-line">
+    <div style="font-size:14px;margin-top:6px;font-weight:700;color:#c62828;">⚡ Rumus Titrasi Berbasis Berat Badan (mcg/kgBB/menit):</div>
+    <div style="font-size:15px;margin:4px 0;background:#fff;padding:6px;border-radius:4px;border:1px solid #66BB6A">
+      <strong>Kebutuhan Syringe Pump (mL/jam) = (Dosis Order × BB × 60) ÷ Konsentrasi Obat (mcg/mL)</strong>
+    </div>
+    <div style="font-size:13px;margin-top:2px;color:#444">
+      • Konversi mg ke mcg = <span class="hl-yellow">Sediaan Utama (mg) × 1000</span>
+    </div>
+    <div class="small-note">Contoh: Dobutamin 250mg dalam 50mL NaCl → konsentrasi = 5 mg/mL = 5000 mcg/mL</div>
+  </div>
+  <div class="calc-box">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">💉 Kalkulator Titrasi Obat (Lengkap & Terintegrasi BB)</div>
+    <div class="calc-row">
+      <label>Metode Perhitungan:</label>
+      <select id="titMode" onchange="toggleTitMode()">
+         <option value="basic">Dosis Langsung Basal (mg atau mcg)</option>
+         <option value="bb">Berdasarkan BB Pasien (mcg/kgBB/menit)</option>
+      </select>
+    </div>
+    <div class="calc-row" id="rowTitBB" style="display:none">
+      <label>Berat Badan Pasien (kg):</label>
+      <input type="number" id="titBB" value="60">
+    </div>
+    <div class="calc-row">
+      <label id="lblTitDosis">Dosis order (mg):</label>
+      <input type="number" id="titDosis" value="10" step="0.1">
+    </div>
+    <div class="calc-row">
+      <label>Total obat tersedia (mg):</label>
+      <input type="number" id="titObat" value="250">
+    </div>
+    <div class="calc-row">
+      <label>Total volume pengencer (mL):</label>
+      <input type="number" id="titVol" value="50">
+    </div>
+    <button class="calc-btn" onclick="hitungTitrasi()">Hitung Titrasi</button>
+    <div id="titResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">4</span> <span class="hl-blue">Rumus Urin Output (UO)</span></div>
+  <div class="formula-box">
+    <div style="font-size:15px">UO (mL/kg/jam) = <span class="hl-yellow">Total urin (mL)</span> ÷ <span class="hl-green">[BB (kg) × Waktu (jam)]</span></div>
+    <hr class="note-line">
+    <div style="font-size:13px">Normal: <span class="hl-green">0.5–1 mL/kg/jam</span> (dewasa)</div>
+    <div style="font-size:13px;margin-top:2px">Oliguria: <span class="hl-pink">&lt;0.5 mL/kg/jam</span> | Anuria: <span class="hl-pink">&lt;100 mL/24jam</span></div>
+  </div>
+  <div class="calc-box">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">🚽 Kalkulator Urin Output</div>
+    <div class="calc-row">
+      <label>Total urin (mL):</label>
+      <input type="number" id="uoUrin" value="400">
+    </div>
+    <div class="calc-row">
+      <label>Berat badan (kg):</label>
+      <input type="number" id="uoBB" value="60">
+    </div>
+    <div class="calc-row">
+      <label>Waktu pengukuran (jam):</label>
+      <input type="number" id="uoJam" value="8">
+    </div>
+    <button class="calc-btn" onclick="hitungUO()">Hitung UO</button>
+    <div id="uoResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">5</span> <span class="hl-purple">Rumus IWL (Insensible Water Loss)</span></div>
+  <div class="formula-box">
+    <div><span class="hl-yellow">Tanpa kenaikan suhu:</span></div>
+    <div style="font-size:15px;margin:3px 0">IWL = <strong>15 mL × BB (kg) × 24 jam</strong> ÷ 24</div>
+    <div style="font-size:13px;color:#666">= 15 mL/kg/24jam (dewasa normal)</div>
+    <hr class="note-line">
+    <div><span class="hl-pink">Dengan kenaikan suhu (demam):</span></div>
+    <div style="font-size:15px;margin:3px 0">IWL = <strong>[(15 + 200 × ΔT) × BB]</strong> ÷ 24</div>
+    <div style="font-size:13px;color:#444;margin-top:4px">
+      <span class="hl-orange">ΔT</span> = Suhu tubuh saat ini − <strong>37°C</strong> (suhu normal)
+    </div>
+    <div class="small-note">Contoh: Suhu 39°C → ΔT = 39 − 37 = 2°C</div>
+    <div class="small-note">200 = koefisien tambahan kehilangan cairan tiap 1°C kenaikan suhu</div>
+  </div>
+  <div class="calc-box">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">🌡️ Kalkulator IWL</div>
+    <div class="calc-row">
+      <label>Berat badan (kg):</label>
+      <input type="number" id="iwlBB" value="60">
+    </div>
+    <div class="calc-row">
+      <label>Suhu tubuh (°C):</label>
+      <input type="number" id="iwlSuhu" value="37" step="0.1">
+    </div>
+    <button class="calc-btn" onclick="hitungIWL()">Hitung IWL</button>
+    <div id="iwlResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">6</span> <span class="hl-green">Balance Cairan</span></div>
+  <div class="formula-box">
+    <div style="font-size:15px">Balance = <span class="hl-green">Total Intake</span> − <span class="hl-pink">Total Output</span></div>
+    <hr class="note-line">
+    <div style="font-size:13px"><span class="hl-green">Intake:</span> Infus + Oral + Obat IV + Makanan (±200mL)</div>
+    <div style="font-size:13px;margin-top:2px"><span class="hl-pink">Output:</span> Urin + Feses + Muntah + Drain + <span class="hl-orange">IWL</span></div>
+    <div style="font-size:13px;margin-top:4px">
+      Normal: <span class="hl-yellow">+500 s/d −500 mL</span> per 24 jam
+    </div>
+  </div>
+  <div class="calc-box">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">⚖️ Kalkulator Balance Cairan</div>
+    <div style="font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:4px">INTAKE (mL):</div>
+    <div class="calc-row"><label>Infus IV:</label><input type="number" id="bcInfus" value="1000" min="0"></div>
+    <div class="calc-row"><label>Oral/minum:</label><input type="number" id="bcOral" value="500" min="0"></div>
+    <div class="calc-row"><label>Obat IV (flush dll):</label><input type="number" id="bcObat" value="100" min="0"></div>
+    <div class="calc-row"><label>Makanan cair:</label><input type="number" id="bcMakan" value="200" min="0"></div>
+    <hr class="divider">
+    <div style="font-size:13px;font-weight:700;color:#C62828;margin-bottom:4px">OUTPUT (mL):</div>
+    <div class="calc-row"><label>Urin:</label><input type="number" id="bcUrin" value="800" min="0"></div>
+    <div class="calc-row"><label>Feses (estimasi):</label><input type="number" id="bcFeses" value="100" min="0"></div>
+    <div class="calc-row"><label>Muntah/drain:</label><input type="number" id="bcMuntah" value="0" min="0"></div>
+    <div class="calc-row"><label>BB untuk IWL (kg):</label><input type="number" id="bcBB" value="60" min="1"></div>
+    <div class="calc-row"><label>Suhu untuk IWL (°C):</label><input type="number" id="bcSuhu" value="37" step="0.1"></div>
+    <button class="calc-btn" onclick="hitungBalance()">Hitung Balance</button>
+    <div id="bcResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">7</span> <span class="hl-pink">Glasgow Coma Scale (GCS)</span></div>
+  <table class="gcs-table">
+    <thead>
+      <tr><th>Komponen</th><th>Respons</th><th>Skor</th></tr>
+    </thead>
+    <tbody>
+      <tr><td rowspan="4"><span class="hl-yellow">E – Eye (Mata)</span></td><td>Spontan membuka</td><td><b>4</b></td></tr>
+      <tr><td>Respon terhadap suara</td><td><b>3</b></td></tr>
+      <tr><td>Respon terhadap nyeri</td><td><b>2</b></td></tr>
+      <tr><td>Tidak ada respons</td><td><b>1</b></td></tr>
+      <tr><td rowspan="5"><span class="hl-green">V – Verbal</span></td><td>Orientasi baik</td><td><b>5</b></td></tr>
+      <tr><td>Bingung (confused)</td><td><b>4</b></td></tr>
+      <tr><td>Kata-kata tidak tepat</td><td><b>3</b></td></tr>
+      <tr><td>Suara tidak berbentuk kata</td><td><b>2</b></td></tr>
+      <tr><td>Tidak ada respons</td><td><b>1</b></td></tr>
+      <tr><td rowspan="6"><span class="hl-blue">M – Motorik</span></td><td>Mengikuti perintah</td><td><b>6</b></td></tr>
+      <tr><td>Melokalisir nyeri</td><td><b>5</b></td></tr>
+      <tr><td>Withdrawal (menarik)</td><td><b>4</b></td></tr>
+      <tr><td>Fleksi abnormal</td><td><b>3</b></td></tr>
+      <tr><td>Ekstensi abnormal</td><td><b>2</b></td></tr>
+      <tr><td>Tidak ada respons</td><td><b>1</b></td></tr>
+    </tbody>
+  </table>
+  <div class="gcs-interp">
+    <div class="gcs-badge" style="background:#E8F5E9;color:#1B5E20">GCS 14–15<br><b>Kompos Mentis</b><br>Sadar penuh</div>
+    <div class="gcs-badge" style="background:#FFF9C4;color:#F57F17">GCS 12–13<br><b>Apatis</b><br>Acuh tak acuh</div>
+    <div class="gcs-badge" style="background:#FFF3E0;color:#E65100">GCS 11–10<br><b>Somnolen</b><br>Ngantuk berat</div>
+    <div class="gcs-badge" style="background:#FCE4EC;color:#880E4F">GCS 9–7<br><b>Stupor</b><br>Hampir tidak sadar</div>
+    <div class="gcs-badge" style="background:#FFEBEE;color:#B71C1C">GCS ≤6<br><b>Koma</b><br>Tidak sadar</div>
+  </div>
+  <div class="calc-box" style="margin-top:10px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">🧠 Kalkulator GCS</div>
+    <div class="calc-row"><label>E – Eye (1–4):</label><select id="gcsE"><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+    <div class="calc-row"><label>V – Verbal (1–5):</label><select id="gcsV"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+    <div class="calc-row"><label>M – Motorik (1–6):</label><select id="gcsM"><option>6</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+    <button class="calc-btn" onclick="hitungGCS()">Interpretasi GCS</button>
+    <div id="gcsResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title"><span class="num">8</span> <span class="hl-orange">Rumus MAP (Mean Arterial Pressure)</span></div>
+  <div class="formula-box">
+    <div style="font-size:15px">MAP = <span class="hl-yellow">(TD Sistolik + 2 × TD Diastolik)</span> ÷ <strong>3</strong></div>
+    <hr class="note-line">
+    <div style="font-size:13px">Normal MAP: <span class="hl-green">70–100 mmHg</span></div>
+    <div style="font-size:13px">MAP &lt;70 → <span class="hl-pink">Perfusi organ terganggu!</span></div>
+    <div style="font-size:13px">MAP &gt;100 → <span class="hl-orange">Hipertensi berat</span></div>
+    <div class="small-note">MAP mencerminkan tekanan rata-rata di arteri selama satu siklus jantung</div>
+  </div>
+  <div class="calc-box">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">📊 Kalkulator MAP</div>
+    <div class="calc-row">
+      <label>TD Sistolik (mmHg):</label>
+      <input type="number" id="mapS" value="120">
+    </div>
+    <div class="calc-row">
+      <label>TD Diastolik (mmHg):</label>
+      <input type="number" id="mapD" value="80">
+    </div>
+    <button class="calc-btn" onclick="hitungMAP()">Hitung MAP</button>
+    <div id="mapResult" class="calc-result" style="display:none"></div>
+  </div>
+</div>
+
+<div style="text-align:center;font-size:12px;color:#aaa;padding:10px 0 20px;font-style:italic">
+  ✏️ Catatan ini hanya untuk referensi pembelajaran — selalu verifikasi dengan pembimbing klinik 
+	(copyright Sobatners@gmail.com)
+</div>
+
+</div>
+</div>
+</div>
+
+<script src="users.js"></script>
+<script>
+// REGISTER SERVICE WORKER (Wajib PWA)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker terdaftar!', reg))
+      .catch(err => console.log('Service Worker gagal:', err));
+  });
+}
+
+// ── Inisialisasi sistem akun ──
+SakuMedika.init();
+
+// ── Cek apakah sudah login (sesi aktif) ──
+window.addEventListener('DOMContentLoaded', function () {
+  // Jika belum ada akun sama sekali → tampilkan panel setup pertama
+  if (SakuMedika.isFirstRun()) {
+    document.getElementById('panelLogin').style.display = 'none';
+    document.getElementById('panelFirstRun').style.display = 'block';
+    return;
+  }
+
+  // Jika sudah ada sesi aktif → langsung masuk
+  var u = SakuMedika.currentUser();
+  if (u) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('noteWrapper').style.display = 'block';
+    document.getElementById('loggedUserName').textContent = u;
+  }
+
+  // Enter key support
+  ['usernameInput','passwordInput'].forEach(function(id) {
+    document.getElementById(id).addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleLogin();
+    });
+  });
+});
+
+// ── Setup Akun Pertama ──
+function handleFirstSetup() {
+  var u = document.getElementById('setupUser').value;
+  var p = document.getElementById('setupPass').value;
+  var c = document.getElementById('setupConfirm').value;
+  var errEl = document.getElementById('setupError');
+
+  var result = SakuMedika.register(u, p, c);
+  if (!result.ok) {
+    errEl.textContent = result.msg;
+    errEl.style.display = 'block';
+    return;
+  }
+  // Langsung login setelah buat akun
+  var loginResult = SakuMedika.login(u, p);
+  if (loginResult.ok) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('noteWrapper').style.display = 'block';
+    document.getElementById('loggedUserName').textContent = loginResult.username;
+  }
+}
+
+// ── Fungsi Login ──
+function handleLogin() {
+  var user = document.getElementById('usernameInput').value;
+  var pass = document.getElementById('passwordInput').value;
+  var result = SakuMedika.login(user, pass);
+  if (result.ok) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('noteWrapper').style.display = 'block';
+    document.getElementById('loggedUserName').textContent = result.username;
+    document.getElementById('loginError').style.display = 'none';
+  } else {
+    var el = document.getElementById('loginError');
+    el.textContent = result.msg;
+    el.style.display = 'block';
+  }
+}
+
+// ── Toggle Show/Hide Password ──
+function togglePass(inputId, btn) {
+  var inp = document.getElementById(inputId);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+// ── Fungsi Logout ──
+function handleLogout() {
+  SakuMedika.logout();
+  document.getElementById('noteWrapper').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+  // Jika semua akun dihapus, kembali ke first-run
+  if (SakuMedika.isFirstRun()) {
+    document.getElementById('panelLogin').style.display = 'none';
+    document.getElementById('panelFirstRun').style.display = 'block';
+  } else {
+    document.getElementById('panelLogin').style.display = 'block';
+    document.getElementById('panelFirstRun').style.display = 'none';
+    document.getElementById('usernameInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginError').style.display = 'none';
+  }
+}
+
+function toggleTitMode() {
+    var mode = document.getElementById('titMode').value;
+    var rowBB = document.getElementById('rowTitBB');
+    var lblDosis = document.getElementById('lblTitDosis');
+    
+    if (mode === 'bb') {
+        rowBB.style.display = 'flex';
+        lblDosis.innerText = 'Dosis Order (mcg/kgBB/menit):';
+        document.getElementById('titDosis').value = '5'; 
+    } else {
+        rowBB.style.display = 'none';
+        lblDosis.innerText = 'Dosis order (mg):';
+        document.getElementById('titDosis').value = '10';
+    }
+}
+
+function cekTTV(){
+  var s=+document.getElementById('ttvTDs').value;
+  var d=+document.getElementById('ttvTDd').value;
+  var nd=+document.getElementById('ttvNd').value;
+  var rr=+document.getElementById('ttvRR').value;
+  var su=+parseFloat(document.getElementById('ttvSu').value).toFixed(1);
+  var spo=+document.getElementById('ttvSpo2').value;
+  var out=[];
+  if(s<90)out.push('⬇️ TD Sistolik RENDAH (Hipotensi)');
+  else if(s>140)out.push('⬆️ TD Sistolik TINGGI (Hipertensi)');
+  else out.push('✅ TD Sistolik normal');
+  if(d<60)out.push('⬇️ TD Diastolik rendah');
+  else if(d>90)out.push('⬆️ TD Diastolik tinggi');
+  else out.push('✅ TD Diastolik normal');
+  if(nd<60)out.push('⬇️ Nadi lambat (Bradikardia <60 bpm)');
+  else if(nd>100)out.push('⬆️ Nadi cepat (Takikardia >100 bpm)');
+  else out.push('✅ Nadi normal');
+  if(rr<16)out.push('⬇️ RR lambat (Bradipnea <16x/mnt)');
+  else if(rr>24)out.push('⬆️ RR cepat (Takipnea >24x/mnt)');
+  else out.push('✅ RR normal');
+  if(su<36.5)out.push('⬇️ Suhu rendah (Hipotermia <36.5°C)');
+  else if(su>37.5)out.push('⬆️ Suhu tinggi (Hipertermia/Demam >37.5°C)');
+  else out.push('✅ Suhu normal');
+  if(spo<90)out.push('🚨 SpO₂ KRITIS! Butuh NRM/Ventilator segera');
+  else if(spo<94)out.push('⚠️ SpO₂ rendah – butuh suplementasi O₂');
+  else out.push('✅ SpO₂ normal (≥95%)');
+  var el=document.getElementById('ttvResult');
+  el.innerHTML=out.join('<br>');
+  el.style.display='block';
+}
+
+function hitungInfus(){
+  var vol=+document.getElementById('infVol').value;
+  var jam=+document.getElementById('infJam').value;
+  var fak=+document.getElementById('infType').value;
+  var mnt=jam*60;
+  var tetes=Math.round((vol*fak)/mnt);
+  var label=fak==20?'Makro':'Micro';
+  var el=document.getElementById('infResult');
+  el.innerHTML='Tetesan = '+vol+' × '+fak+' ÷ '+mnt+' mnt<br><b>= '+tetes+' tetes/menit</b> ('+label+')<br><span style="font-size:12px;color:#777">≈ '+(tetes/4).toFixed(1)+' tetes per 15 detik</span>';
+  el.style.display='block';
+}
+
+function hitungTitrasi(){
+  var mode = document.getElementById('titMode').value;
+  var dosis = +document.getElementById('titDosis').value;
+  var obat = +document.getElementById('titObat').value;
+  var vol = +document.getElementById('titVol').value;
+  var el = document.getElementById('titResult');
+  
+  var konsenMg = (obat / vol);
+  var konsenMcg = konsenMg * 1000;
+  
+  if (mode === 'bb') {
+      var bb = +document.getElementById('titBB').value;
+      var mlJam = (dosis * bb * 60) / konsenMcg;
+      
+      el.innerHTML = 'Konversi Sediaan = ' + obat + ' mg × 1000 = <b>' + (obat*1000) + ' mcg</b><br>' +
+                     'Konsentrasi Obat = ' + (obat*1000) + ' mcg ÷ ' + vol + ' mL = <b>' + konsenMcg.toFixed(1) + ' mcg/mL</b><br>' +
+                     'Kecepatan Pompa = (' + dosis + ' mcg × ' + bb + ' kgBB × 60 mnt) ÷ ' + konsenMcg.toFixed(0) + ' mcg/mL<br>' +
+                     '<b>= ' + mlJam.toFixed(2) + ' mL/jam (Syringe Pump)</b>';
+  } else {
+      var give = (dosis / konsenMg);
+      el.innerHTML = 'Konsentrasi = ' + obat + ' mg ÷ ' + vol + ' mL = <b>' + konsenMg.toFixed(2) + ' mg/mL</b><br>' +
+                     'Volume diberikan = ' + dosis + ' ÷ ' + konsenMg.toFixed(2) + ' = <b>' + give.toFixed(2) + ' mL</b>';
+  }
+  el.style.display = 'block';
+}
+
+function hitungUO(){
+  var urin=+document.getElementById('uoUrin').value;
+  var bb=+document.getElementById('uoBB').value;
+  var jam=+document.getElementById('uoJam').value;
+  var uo=(urin/(bb*jam));
+  var status='';
+  if(uo<0.5)status='<span style="color:#C62828">⚠️ OLIGURIA (< 0.5 mL/kg/jam) — waspada gagal ginjal!</span>';
+  else if(uo<=1)status='<span style="color:#2E7D32">✅ Normal (0.5–1 mL/kg/jam)</span>';
+  else status='<span style="color:#1565C0">ℹ️ Di atas normal (> 1 mL/kg/jam)</span>';
+  var el=document.getElementById('uoResult');
+  el.innerHTML='UO = '+urin+' ÷ ('+bb+' × '+jam+') = <b>'+uo.toFixed(2)+' mL/kg/jam</b><br>'+status;
+  el.style.display='block';
+}
+
+function hitungIWL(){
+  var bb=+document.getElementById('iwlBB').value;
+  var su=+parseFloat(document.getElementById('iwlSuhu').value).toFixed(1);
+  var dt=su-37;
+  var iwlNormal=(15*bb*24)/24;
+  var el=document.getElementById('iwlResult');
+  if(dt<=0){
+    el.innerHTML='IWL (tanpa demam) = 15 × '+bb+' = <b>'+Math.round(iwlNormal)+' mL/24jam</b><br><span style="font-size:12px;color:#777">ΔT = '+dt.toFixed(1)+'°C (tidak ada kenaikan suhu)</span>';
+  } else {
+    var iwlDemam=((15+(200*dt))*bb*24)/24;
+    el.innerHTML='ΔT = '+su+' − 37 = <b>'+dt.toFixed(1)+'°C</b><br>IWL = (15 + 200×'+dt.toFixed(1)+') × '+bb+' = <b>'+Math.round(iwlDemam)+' mL/24jam</b><br><span style="font-size:12px;color:#E65100">Demam meningkatkan IWL +'+Math.round(iwlDemam-iwlNormal)+' mL dari normal</span>';
+  }
+  el.style.display='block';
+}
+
+function hitungBalance(){
+  var infus=+document.getElementById('bcInfus').value||0;
+  var oral=+document.getElementById('bcOral').value||0;
+  var obat=+document.getElementById('bcObat').value||0;
+  var makan=+document.getElementById('bcMakan').value||0;
+  var urin=+document.getElementById('bcUrin').value||0;
+  var feses=+document.getElementById('bcFeses').value||0;
+  var muntah=+document.getElementById('bcMuntah').value||0;
+  var bb=+document.getElementById('bcBB').value||60;
+  var su=+parseFloat(document.getElementById('bcSuhu').value).toFixed(1);
+  var dt=su-37;
+  var iwl=dt>0?Math.round(((15+(200*dt))*bb*24)/24):Math.round(15*bb);
+  var intake=infus+oral+obat+makan;
+  var output=urin+feses+muntah+iwl;
+  var bal=intake-output;
+  var status='';
+  if(bal>500)status='<span style="color:#1565C0">⬆️ Kelebihan cairan (overload)</span>';
+  else if(bal<-500)status='<span style="color:#C62828">⬇️ Kekurangan cairan (defisit)</span>';
+  else status='<span style="color:#2E7D32">✅ Balance cairan normal</span>';
+  var el=document.getElementById('bcResult');
+  el.innerHTML='Intake total = <b>'+intake+' mL</b><br>IWL (dihitung otomatis) = <b>'+iwl+' mL</b><br>Output total = <b>'+output+' mL</b><br>Balance = '+intake+' − '+output+' = <b>'+(bal>0?'+':'')+bal+' mL</b><br>'+status;
+  el.style.display='block';
+}
+
+function hitungGCS(){
+  var e=+document.getElementById('gcsE').value;
+  var v=+document.getElementById('gcsV').value;
+  var m=+document.getElementById('gcsM').value;
+  var total=e+v+m;
+  var interp='';
+  if(total>=14)interp='<span style="color:#2E7D32"><b>Kompos Mentis</b> — Sadar penuh, orientasi baik</span>';
+  else if(total>=12)interp='<span style="color:#827717"><b>Apatis</b> — Acuh tak acuh terhadap lingkungan</span>';
+  else if(total>=10)interp='<span style="color:#E65100"><b>Somnolen</b> — Mengantuk berat, dapat dibangunkan</span>';
+  else if(total>=7)interp='<span style="color:#880E4F"><b>Stupor</b> — Hampir tidak sadar, respons minimal</span>';
+  else interp='<span style="color:#B71C1C"><b>KOMA</b> — Tidak sadar, segera laporkan!</span>';
+  var el=document.getElementById('gcsResult');
+  el.innerHTML='GCS E'+e+' V'+v+' M'+m+' = <b>Total '+total+'</b><br>'+interp;
+  el.style.display='block';
+}
+
+function hitungMAP(){
+  var s=+document.getElementById('mapS').value;
+  var d=+document.getElementById('mapD').value;
+  var map=Math.round((s+2*d)/3);
+  var status='';
+  if(map<70)status='<span style="color:#C62828">⚠️ MAP RENDAH — risiko hipoperfusi organ!</span>';
+  else if(map<=100)status='<span style="color:#2E7D32">✅ MAP normal (70–100 mmHg)</span>';
+  else status='<span style="color:#E65100">⬆️ MAP TINGGI — hipertensi berat</span>';
+  var el=document.getElementById('mapResult');
+  el.innerHTML='MAP = ('+s+' + 2×'+d+') ÷ 3 = <b>'+map+' mmHg</b><br>'+status;
+  el.style.display='block';
+}
+</script>
+</body>
+</html>

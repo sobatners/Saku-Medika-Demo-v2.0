@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajemen Akun — Saku Medika</title>
+<meta name="theme-color" content="#f9a825">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Caveat',cursive;background:#F4F3EF;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+.page-title{font-size:26px;font-weight:700;color:#1a1a1a;text-align:center;margin-bottom:4px}
+.page-sub{font-size:14px;color:#5d4037;text-align:center;margin-bottom:20px}
+
+.card{background:#FFFDE7;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.08);border:2px solid #f9a825;width:100%;max-width:380px;padding:24px;margin-bottom:16px}
+.card h3{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:14px;border-bottom:2px dashed #f9a825;padding-bottom:8px}
+
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:15px;font-weight:700;color:#444;margin-bottom:4px}
+.form-group input{width:100%;padding:8px 12px;font-family:'Caveat',cursive;font-size:17px;border:1.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a1a;transition:border-color 0.2s}
+.form-group input:focus{outline:none;border-color:#f9a825}
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:42px}
+.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:2px;color:#aaa;transition:color 0.2s;user-select:none}
+.eye-btn:hover{color:#f9a825}
+
+.btn{width:100%;padding:9px;font-family:'Caveat',cursive;font-size:18px;font-weight:700;border:none;border-radius:6px;cursor:pointer;margin-top:6px;transition:opacity 0.2s}
+.btn:hover{opacity:0.85}
+.btn-primary{background:#f9a825;color:#fff}
+.btn-danger{background:#ef5350;color:#fff}
+.btn-secondary{background:#e0e0e0;color:#333}
+
+.msg{font-size:14px;font-weight:700;margin-top:10px;padding:7px 12px;border-radius:6px;display:none}
+.msg.ok{background:#E8F5E9;color:#2E7D32;display:block}
+.msg.err{background:#FFEBEE;color:#C62828;display:block}
+
+.tabs{display:flex;gap:8px;margin-bottom:16px;width:100%;max-width:380px}
+.tab{flex:1;padding:8px;font-family:'Caveat',cursive;font-size:16px;font-weight:700;border:2px solid #f9a825;border-radius:8px;background:#FFFDE7;color:#c88b00;cursor:pointer;text-align:center;transition:all 0.2s}
+.tab.active{background:#f9a825;color:#fff}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.back-link{font-size:15px;color:#f9a825;text-decoration:none;font-weight:700;display:inline-block;margin-bottom:12px}
+.back-link:hover{text-decoration:underline}
+
+.user-info-bar{background:#FFF9C4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 14px;font-size:15px;color:#555;margin-bottom:16px;width:100%;max-width:380px;text-align:center}
+.user-info-bar b{color:#c88b00}
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">← Kembali ke Catatan</a>
+<div class="page-title">👤 Manajemen Akun</div>
+<div class="page-sub">Saku Medika — Catatan Praktek Perawat</div>
+
+<div class="user-info-bar" id="userInfoBar">Memuat info akun...</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('register')" id="tabRegister">📝 Daftar</div>
+  <div class="tab" onclick="switchTab('changePass')" id="tabChangePass">🔒 Ganti Password</div>
+  <div class="tab" onclick="switchTab('changeUser')" id="tabChangeUser">✏️ Ganti Username</div>
+</div>
+
+<!-- ═══ PANEL: DAFTAR AKUN BARU ═══ -->
+<div class="panel active card" id="panelRegister">
+  <h3>📝 Daftar Akun Baru</h3>
+  <div class="form-group">
+    <label>Username Baru</label>
+    <input type="text" id="regUser" placeholder="Min. 3 karakter (huruf, angka, _)" autocomplete="off">
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <div class="pass-wrap">
+      <input type="password" id="regPass" placeholder="Min. 6 karakter">
+      <button type="button" class="eye-btn" onclick="togglePass('regPass',this)">👁️</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Konfirmasi Password</label>
+    <div class="pass-wrap">
+      <input type="password" id="regConfirm" placeholder="Ketik ulang password">
+      <button type="button" class="eye-btn" onclick="togglePass('regConfirm',this)">👁️</button>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="doRegister()">Buat Akun</button>
+  <div class="msg" id="msgRegister"></div>
+</div>
+
+<!-- ═══ PANEL: GANTI PASSWORD ═══ -->
+<div class="panel card" id="panelChangePass">
+  <h3>🔒 Ganti Password</h3>
+  <p style="font-size:13px;color:#777;margin-bottom:12px">Kamu harus memasukkan password lama untuk konfirmasi.</p>
+  <div class="form-group">
+    <label>Password Lama</label>
+    <div class="pass-wrap">
+      <input type="password" id="cpOld" placeholder="Password saat ini">
+      <button type="button" class="eye-btn" onclick="togglePass('cpOld',this)">👁️</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Password Baru</label>
+    <div class="pass-wrap">
+      <input type="password" id="cpNew" placeholder="Min. 6 karakter">
+      <button type="button" class="eye-btn" onclick="togglePass('cpNew',this)">👁️</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Konfirmasi Password Baru</label>
+    <div class="pass-wrap">
+      <input type="password" id="cpConfirm" placeholder="Ketik ulang password baru">
+      <button type="button" class="eye-btn" onclick="togglePass('cpConfirm',this)">👁️</button>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="doChangePass()">Simpan Password Baru</button>
+  <div class="msg" id="msgChangePass"></div>
+</div>
+
+<!-- ═══ PANEL: GANTI USERNAME ═══ -->
+<div class="panel card" id="panelChangeUser">
+  <h3>✏️ Ganti Username</h3>
+  <p style="font-size:13px;color:#777;margin-bottom:12px">Masukkan password untuk konfirmasi perubahan username.</p>
+  <div class="form-group">
+    <label>Username Baru</label>
+    <input type="text" id="cuNew" placeholder="Min. 3 karakter (huruf, angka, _)" autocomplete="off">
+  </div>
+  <div class="form-group">
+    <label>Password (untuk konfirmasi)</label>
+    <div class="pass-wrap">
+      <input type="password" id="cuPass" placeholder="Password kamu saat ini">
+      <button type="button" class="eye-btn" onclick="togglePass('cuPass',this)">👁️</button>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="doChangeUser()">Simpan Username Baru</button>
+  <div class="msg" id="msgChangeUser"></div>
+</div>
+
+<script src="users.js"></script>
+<script>
+  SakuMedika.init();
+
+  function togglePass(inputId, btn) {
+    var inp = document.getElementById(inputId);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁️'; }
+  }
+
+  // Redirect ke index jika belum login
+  var me = SakuMedika.currentUser();
+  if (!me) {
+    alert('Kamu belum login. Silakan login dulu.');
+    window.location.href = 'index.html';
+  }
+
+  // Tampilkan info user
+  document.getElementById('userInfoBar').innerHTML = 'Login sebagai: <b>' + me + '</b>';
+
+  // ── Switch Tab ──
+  function switchTab(name) {
+    ['register','changePass','changeUser'].forEach(function(t) {
+      document.getElementById('panel' + cap(t)).classList.remove('active');
+      document.getElementById('tab' + cap(t)).classList.remove('active');
+    });
+    document.getElementById('panel' + cap(name)).classList.add('active');
+    document.getElementById('tab' + cap(name)).classList.add('active');
+  }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function showMsg(id, result) {
+    var el = document.getElementById(id);
+    el.className = 'msg ' + (result.ok ? 'ok' : 'err');
+    el.textContent = result.msg || (result.ok ? '✅ Berhasil!' : '❌ Gagal.');
+  }
+
+  // ── Daftar Akun Baru ──
+  function doRegister() {
+    var u = document.getElementById('regUser').value;
+    var p = document.getElementById('regPass').value;
+    var c = document.getElementById('regConfirm').value;
+    var result = SakuMedika.register(u, p, c);
+    showMsg('msgRegister', result);
+    if (result.ok) {
+      document.getElementById('regUser').value = '';
+      document.getElementById('regPass').value = '';
+      document.getElementById('regConfirm').value = '';
+    }
+  }
+
+  // ── Ganti Password ──
+  function doChangePass() {
+    var op = document.getElementById('cpOld').value;
+    var np = document.getElementById('cpNew').value;
+    var cp = document.getElementById('cpConfirm').value;
+    var me = SakuMedika.currentUser();
+    if (!me) return;
+    var result = SakuMedika.changePassword(me, op, np, cp);
+    showMsg('msgChangePass', result);
+    if (result.ok) {
+      document.getElementById('cpOld').value = '';
+      document.getElementById('cpNew').value = '';
+      document.getElementById('cpConfirm').value = '';
+    }
+  }
+
+  // ── Ganti Username ──
+  function doChangeUser() {
+    var nu = document.getElementById('cuNew').value;
+    var p  = document.getElementById('cuPass').value;
+    var me = SakuMedika.currentUser();
+    if (!me) return;
+    var result = SakuMedika.changeUsername(me, p, nu);
+    showMsg('msgChangeUser', result);
+    if (result.ok) {
+      // Update tampilan
+      me = SakuMedika.currentUser();
+      document.getElementById('userInfoBar').innerHTML = 'Login sebagai: <b>' + me + '</b>';
+      document.getElementById('cuNew').value = '';
+      document.getElementById('cuPass').value = '';
+    }
+  }
+</script>
+</body>
+</html>
